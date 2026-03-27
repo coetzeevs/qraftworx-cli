@@ -265,3 +265,72 @@ func TestClient_SearchWithGlobal_RequiresEmbeddings(t *testing.T) {
 		t.Fatal("expected error from Search with noop embedder")
 	}
 }
+
+func TestClient_SearchWithGlobal_FallsBackWithoutGlobal(t *testing.T) {
+	c := testClient(t) // no global brain
+
+	// SearchWithGlobal should fall back to project-only search
+	// Still errors because noop embedder, but exercises the fallback path
+	_, err := c.SearchWithGlobal(context.Background(), "test", 5, 0.3)
+	if err == nil {
+		t.Fatal("expected error from SearchWithGlobal with noop embedder")
+	}
+}
+
+func TestClient_SearchWithGlobal_WithGlobal(t *testing.T) {
+	c := testClientWithGlobal(t)
+
+	// Exercises the SearchWithGlobal path with global present
+	// Errors because noop embedder, but covers the branch
+	_, err := c.SearchWithGlobal(context.Background(), "test", 5, 0.3)
+	if err == nil {
+		t.Fatal("expected error from SearchWithGlobal with noop embedder")
+	}
+}
+
+func TestClient_AddToGlobal_NoGlobal(t *testing.T) {
+	c := testClient(t) // no global brain
+
+	_, err := c.AddToGlobal("test", brain.Concept)
+	if err == nil {
+		t.Fatal("expected error from AddToGlobal without global brain")
+	}
+}
+
+func TestClient_ListGlobal_NoGlobal(t *testing.T) {
+	c := testClient(t) // no global brain
+
+	_, err := c.ListGlobal(brain.ListNodesOpts{})
+	if err == nil {
+		t.Fatal("expected error from ListGlobal without global brain")
+	}
+}
+
+func TestNewClientFromPath(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "test.sqlite")
+	// Init a brain first so Open succeeds
+	b, err := brain.Init(path, brain.EmbedConfig{Provider: "none"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = b.Close()
+
+	c, err := NewClientFromPath(path)
+	if err != nil {
+		t.Fatalf("NewClientFromPath: %v", err)
+	}
+	defer func() { _ = c.Close() }()
+
+	// Verify it works
+	_, err = c.Add("test", brain.Concept)
+	if err != nil {
+		t.Fatalf("Add via FromPath client: %v", err)
+	}
+}
+
+func TestNewClientFromPath_MissingDB(t *testing.T) {
+	_, err := NewClientFromPath("/nonexistent/db.sqlite")
+	if err == nil {
+		t.Fatal("expected error for missing DB")
+	}
+}
