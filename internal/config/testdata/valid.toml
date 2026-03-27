@@ -1,0 +1,40 @@
+[gemini]
+model = "gemini-2.5-pro"
+max_tokens = 8192
+max_tool_iterations = 10
+timeout = "30s"
+
+[cerebro]
+project_dir = "~/.qraftworx/cerebro"
+
+[sensors.moonraker]
+type = "moonraker"
+url = "http://localhost:7125"
+poll_timeout = "5s"
+
+[sensors.mqtt]
+type = "mqtt"
+broker_url = "tls://broker.example.com:8883"
+topic = "printer/telemetry"
+ca_cert = "/etc/certs/ca.pem"
+client_cert = "/etc/certs/client.pem"
+client_key = "/etc/certs/client-key.pem"
+poll_timeout = "10s"
+
+[media.webcam]
+type = "v4l2"
+device = "/dev/video0"
+resolution = "1920x1080"
+
+[media.gopro]
+type = "http"
+url = "http://10.5.5.9:8080/gopro/camera/stream"
+resolution = "1080p"
+
+[logging]
+path = "~/.qraftworx/logs"
+level = "info"
+
+[cost]
+daily_budget_usd = 5.00
+warn_threshold_usd = 4.00
