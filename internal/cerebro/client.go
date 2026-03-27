@@ -58,6 +58,12 @@ func NewClientFromPath(dbPath string) (*Client, error) {
 	return &Client{brain: b}, nil
 }
 
+// NewClientForTest creates a Client from an existing Brain instance.
+// This is intended for use in tests outside the cerebro package.
+func NewClientForTest(b *brain.Brain) *Client {
+	return &Client{brain: b}
+}
+
 // Close closes all brain connections.
 func (c *Client) Close() error {
 	var errs []error
