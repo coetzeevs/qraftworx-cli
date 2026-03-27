@@ -1,0 +1,19 @@
+{
+  "result": {
+    "status": {
+      "extruder": {
+        "temperature": 205.3
+      },
+      "heater_bed": {
+        "temperature": 60.1
+      },
+      "print_stats": {
+        "state": "printing",
+        "filename": "benchy.gcode"
+      },
+      "display_status": {
+        "progress": 0.42
+      }
+    }
+  }
+}
