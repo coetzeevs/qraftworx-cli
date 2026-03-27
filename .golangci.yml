@@ -1,0 +1,43 @@
+version: "2"
+
+formatters:
+  enable:
+    - gofmt
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+    - unused
+    - ineffassign
+    - gosec
+    - gocritic
+    - misspell
+    - bodyclose
+    - noctx
+    - exhaustive
+    - sqlclosecheck
+
+  settings:
+    errcheck:
+      check-type-assertions: true
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+        - performance
+    gosec:
+      excludes:
+        - G301
+        - G304
+    exhaustive:
+      default-signifies-exhaustive: true
+
+  exclusions:
+    rules:
+      - linters: [gosec]
+        text: "G201|G202"
+      - linters: [gocritic]
+        path: "_test\\.go$"
+        text: "hugeParam"

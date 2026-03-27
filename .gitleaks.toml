@@ -1,0 +1,16 @@
+title = "Qraft gitleaks config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "gemini-api-key"
+description = "Google AI / Gemini API Key"
+regex = '''AIza[0-9A-Za-z\-_]{35}'''
+tags = ["key", "google"]
+
+[allowlist]
+paths = [
+    '''testdata/.*\.json''',
+    '''testdata/.*\.golden''',
+]
