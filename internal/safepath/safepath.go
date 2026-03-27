@@ -60,6 +60,31 @@ func New(raw string, allowedBases []string) (SafePath, error) {
 	return SafePath{}, fmt.Errorf("safepath: path %q is not within any allowed base", raw)
 }
 
+// NewOutput validates a path for a file that does not yet exist (e.g., ffmpeg output).
+// It validates the parent directory exists and is within allowed bases,
+// then constructs the full path using the validated parent + filename.
+func NewOutput(raw string, allowedBases []string) (SafePath, error) {
+	if len(allowedBases) == 0 {
+		return SafePath{}, fmt.Errorf("safepath: no allowed bases provided")
+	}
+
+	if !filepath.IsAbs(raw) {
+		return SafePath{}, fmt.Errorf("safepath: path must be absolute, got %q", raw)
+	}
+
+	cleaned := filepath.Clean(raw)
+	dir := filepath.Dir(cleaned)
+	base := filepath.Base(cleaned)
+
+	// Validate the parent directory exists and is within allowed bases
+	parentSafe, err := New(dir, allowedBases)
+	if err != nil {
+		return SafePath{}, fmt.Errorf("safepath: validating parent of output path: %w", err)
+	}
+
+	return SafePath{resolved: filepath.Join(parentSafe.resolved, base)}, nil
+}
+
 // String returns the resolved path.
 func (p SafePath) String() string {
 	return p.resolved
