@@ -171,3 +171,34 @@ func TestSafePath_String(t *testing.T) {
 		t.Errorf("String()=%q, want %q", sp.String(), expected)
 	}
 }
+
+func TestNewOutput_NonExistentFile(t *testing.T) {
+	base := t.TempDir()
+
+	// File doesn't exist yet, but parent dir does
+	sp, err := NewOutput(filepath.Join(base, "new_file.txt"), []string{base})
+	if err != nil {
+		t.Fatalf("expected success for non-existent output file, got: %v", err)
+	}
+	if sp.String() == "" {
+		t.Error("expected non-empty resolved path")
+	}
+}
+
+func TestNewOutput_RejectsTraversal(t *testing.T) {
+	base := t.TempDir()
+
+	_, err := NewOutput(filepath.Join(base, "..", "escape.txt"), []string{base})
+	if err == nil {
+		t.Error("expected error for traversal in output path")
+	}
+}
+
+func TestNewOutput_RejectsNonExistentParent(t *testing.T) {
+	base := t.TempDir()
+
+	_, err := NewOutput(filepath.Join(base, "nodir", "file.txt"), []string{base})
+	if err == nil {
+		t.Error("expected error when parent directory doesn't exist")
+	}
+}

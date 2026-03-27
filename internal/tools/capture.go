@@ -71,7 +71,7 @@ func (t *CaptureMediaTool) Execute(ctx context.Context, args json.RawMessage) (a
 
 	// Build output path within workDir
 	outputRaw := filepath.Join(t.workDir.String(), a.Filename)
-	output, err := safepath.New(outputRaw, []string{t.workDir.String()})
+	output, err := safepath.NewOutput(outputRaw, []string{t.workDir.String()})
 	if err != nil {
 		return nil, fmt.Errorf("capture_media: output path validation: %w", err)
 	}

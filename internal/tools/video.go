@@ -105,7 +105,7 @@ func (t *ProcessVideoTool) Execute(ctx context.Context, args json.RawMessage) (a
 
 	// Build output path within workDir
 	outputRaw := filepath.Join(t.workDir.String(), a.Output)
-	outputPath, err := safepath.New(outputRaw, []string{t.workDir.String()})
+	outputPath, err := safepath.NewOutput(outputRaw, []string{t.workDir.String()})
 	if err != nil {
 		return nil, fmt.Errorf("process_video: output path validation: %w", err)
 	}
