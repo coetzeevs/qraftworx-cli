@@ -7,9 +7,15 @@ import (
 	cerebroclient "github.com/coetzeevs/qraftworx-cli/internal/cerebro"
 )
 
+// SensorPoller abstracts sensor polling for dependency injection.
+type SensorPoller interface {
+	PollAll(ctx context.Context) map[string]any
+}
+
 // Hydrator assembles context for Gemini calls.
 type Hydrator struct {
 	cerebro          *cerebroclient.Client
+	sensors          SensorPoller
 	maxContextTokens int
 }
 
@@ -21,11 +27,17 @@ func New(client *cerebroclient.Client, maxContextTokens int) *Hydrator {
 	}
 }
 
+// WithSensors sets the sensor poller for the hydrator.
+func (h *Hydrator) WithSensors(poller SensorPoller) *Hydrator {
+	h.sensors = poller
+	return h
+}
+
 // HydratedContext is the assembled context for a Gemini call.
 type HydratedContext struct {
 	UserPrompt    string
 	Memories      []brain.ScoredNode
-	SensorState   map[string]any // nil until Phase 5
+	SensorState   map[string]any // populated from sensor poller
 	SystemPrompt  string
 	TokenEstimate int
 }
@@ -45,6 +57,11 @@ func (h *Hydrator) Hydrate(ctx context.Context, prompt string) (*HydratedContext
 			memories = nil
 		}
 		hc.Memories = memories
+	}
+
+	// Poll sensors if available
+	if h.sensors != nil {
+		hc.SensorState = h.sensors.PollAll(ctx)
 	}
 
 	// Estimate tokens and truncate if needed
