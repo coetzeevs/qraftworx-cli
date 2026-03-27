@@ -1,6 +1,6 @@
 # Binaries
 bin/
-qraft
+/qraft
 
 # Test artifacts
 coverage.out

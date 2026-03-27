@@ -1,0 +1,11 @@
+[gemini]
+max_tokens = 8192
+timeout = "30s"
+
+[logging]
+path = "~/.qraftworx/logs"
+level = "info"
+
+[cost]
+daily_budget_usd = 5.00
+warn_threshold_usd = 4.00
